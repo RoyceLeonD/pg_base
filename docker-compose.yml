@@ -1,0 +1,42 @@
+services:
+  postgres:
+    build: 
+      context: .
+    image: custom-postgres:17
+    container_name: postgres-advanced
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: appdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d appdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # Additional services are disabled for now
+  # redis:
+  #   image: redis:alpine
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  
+  # rabbitmq:
+  #   image: rabbitmq:management
+  #   container_name: rabbitmq
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  
+  # memcached:
+  #   image: memcached:alpine
+  #   container_name: memcached
+  #   ports:
+  #     - "11211:11211"
+
+volumes:
+  postgres-data:
