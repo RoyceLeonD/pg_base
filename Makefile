@@ -2,7 +2,7 @@
 include .env
 
 # Phony targets
-.PHONY: help build start stop clean restart logs psql test-features monitor check-extensions
+.PHONY: help build start stop clean restart logs psql test-features monitor check-extensions publish
 
 # Default target
 help:
@@ -17,6 +17,7 @@ help:
 	@echo "  make test-features - Run test script to verify features"
 	@echo "  make monitor     - Monitor container status and show logs"
 	@echo "  make check-extensions - Check which PostgreSQL extensions are installed"
+	@echo "  make publish    - Publish container to docker.antska.com registry"
 
 # Build image
 build:
@@ -68,3 +69,8 @@ monitor:
 check-extensions:
 	@echo "Checking installed PostgreSQL extensions..."
 	./scripts/monitor.sh extensions
+	
+# Publish container to registry
+publish:
+	@echo "Publishing container to registry..."
+	./scripts/publish.sh

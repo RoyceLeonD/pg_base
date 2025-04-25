@@ -2,8 +2,22 @@
 FROM postgres:17
 
 # Set labels for metadata
-LABEL maintainer="Your Company <info@example.com>"
+LABEL maintainer="Royce Leon DSouza"
 LABEL description="Advanced PostgreSQL container with extensions for scheduling, API, pipelines, messaging, and caching"
+LABEL version="1.0"
+LABEL org.opencontainers.image.source="https://github.com/royceleond/pg_base"
+
+# Security hardening
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set secure permissions and create necessary directories
+RUN mkdir -p /var/lib/postgresql/data /var/run/postgresql \
+    && chown -R postgres:postgres /var/lib/postgresql /var/run/postgresql \
+    && chmod 775 /var/lib/postgresql/data /var/run/postgresql
 
 # Install build dependencies and extension dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -77,6 +91,23 @@ COPY scripts/init-extensions.sql /docker-entrypoint-initdb.d/
 
 # Expose PostgreSQL port
 EXPOSE 5432
+
+# Ensure all files belong to postgres user
+RUN find /docker-entrypoint-initdb.d/ -type f -exec chmod 0755 {} \; \
+    && find /docker-entrypoint-initdb.d/ -type f -exec chown postgres:postgres {} \; \
+    && chown postgres:postgres /etc/postgresql/postgresql.conf \
+    && chmod 0600 /etc/postgresql/postgresql.conf
+
+# Remove unnecessary packages
+RUN apt-get purge -y --auto-remove build-essential git wget unzip cmake pkg-config \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Switch back to postgres user
+USER postgres
+
+# Use tini as init to handle signals properly
+ENTRYPOINT ["/usr/bin/tini", "--"]
 
 # Set the custom postgresql.conf as the configuration file
 CMD ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]

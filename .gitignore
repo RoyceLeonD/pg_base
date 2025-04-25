@@ -1,1 +1,29 @@
+# Environment variables
 .env
+
+# Claude Code guidance
+CLAUDE.md
+
+# Docker
+.docker/
+
+# Logs
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDE directories
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+/build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

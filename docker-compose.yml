@@ -2,7 +2,7 @@ services:
   postgres:
     build: 
       context: .
-    image: custom-postgres:17
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
     container_name: postgres-advanced
     ports:
       - "5432:5432"
